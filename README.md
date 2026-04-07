@@ -1,59 +1,74 @@
-# CountryWeatherApp
+# Country & Weather App (Angular)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.5.
+Search countries, view details, and fetch **live weather for the capital city**.
 
-## Development server
+## Features (Assignment Checklist)
 
-To start a local development server, run:
+- **Countries list**: name, flag, region (cards)
+- **Search**: input box + filtering using `ngModel`
+- **Routing**:
+  - `/` → countries list
+  - `/country/:code` → details page
+- **Details page**: capital, population, currency
+- **Weather**: current temperature + condition for the capital (no API key)
+- **Error handling**: friendly messages for failed API calls
+- **UI improvements**: loader, responsive card grid, Material 3 styling, light/dark toggle
+- **Bonus**: favorites feature (persisted in `localStorage`)
 
-```bash
-ng serve
-```
+## APIs Used
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- **Countries**: Rest Countries v3.1 (`https://restcountries.com/`)
+- **Weather**: Open‑Meteo (Forecast + Geocoding) (`https://open-meteo.com/`)
 
-## Code scaffolding
+## Tech Stack
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- Angular (standalone components + routing)
+- TypeScript
+- Angular Material (Material 3)
+- SCSS
 
-```bash
-ng generate component component-name
-```
+## Getting Started
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+From the project folder:
 
 ```bash
-ng test
+npm install
+npm start
 ```
 
-## Running end-to-end tests
+Then open `http://localhost:4200/`.
 
-For end-to-end (e2e) testing, run:
+### Windows PowerShell issue (`npm.ps1 cannot be loaded`)
+
+If PowerShell blocks npm scripts, use one of these:
+
+```powershell
+npm.cmd install
+npm.cmd start
+```
+
+or
+
+```powershell
+cmd /c "npm install"
+cmd /c "npm start"
+```
+
+Optional (only for current PowerShell session):
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+npm install
+npm start
+```
+
+## Build
 
 ```bash
-ng e2e
+npm run build
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Notes
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- Weather is fetched using the country’s `capitalInfo.latlng` when available; otherwise it falls back to Open‑Meteo geocoding by capital name.
+- Favorites are stored locally under the key `cw_favorites_v1`.

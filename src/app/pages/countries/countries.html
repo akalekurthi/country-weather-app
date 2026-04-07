@@ -1,0 +1,179 @@
+<div class="countries-page">
+  <header class="countries-header">
+    <div class="header-left">
+      <h2>Countries overview</h2>
+      <p>Browse all countries, search instantly, and pin favorites for quick access.</p>
+    </div>
+
+    <div class="header-right">
+      <div class="view-toggle" role="tablist" aria-label="View mode">
+        <button
+          mat-button
+          type="button"
+          class="view-pill"
+          [class.view-pill-active]="!favoritesOnly()"
+          (click)="favoritesOnly.set(false)"
+          role="tab"
+        >
+          <mat-icon>language</mat-icon>
+          All
+        </button>
+
+        <button
+          mat-button
+          type="button"
+          class="view-pill"
+          [class.view-pill-active]="favoritesOnly()"
+          (click)="favoritesOnly.set(true)"
+          role="tab"
+        >
+          <mat-icon>star</mat-icon>
+          Favorites
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <section class="countries-controls">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search countries</mat-label>
+      <input
+        matInput
+        [ngModel]="query()"
+        (ngModelChange)="query.set($event)"
+        placeholder='Try "Japan", "Europe", or a capital like "Delhi"'
+      />
+
+      @if (query()) {
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="clearSearch()"
+          aria-label="Clear search"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+
+    <div class="chips-row">
+      <mat-chip-set>
+        <mat-chip>
+          <mat-icon matChipAvatar aria-hidden="true">travel_explore</mat-icon>
+          {{ filtered().length }} result{{ filtered().length === 1 ? "" : "s" }}
+        </mat-chip>
+
+        @if (favoritesOnly()) {
+          <mat-chip>
+            <mat-icon matChipAvatar aria-hidden="true">star</mat-icon>
+            Favorites only
+          </mat-chip>
+        }
+      </mat-chip-set>
+    </div>
+  </section>
+
+  @if (loading()) {
+    <section class="panel">
+      <app-loader />
+    </section>
+  } @else {
+    @if (error()) {
+      <section class="panel">
+        <mat-card class="status-card status-error" appearance="outlined">
+          <mat-card-content>
+            <div class="status-main">
+              <div>
+                <div class="status-title">Unable to load countries</div>
+                <div class="status-text">{{ error() }}</div>
+              </div>
+              <button mat-stroked-button type="button" (click)="reload()">
+                <mat-icon>refresh</mat-icon>
+                Retry
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </section>
+    }
+
+    <section class="countries-grid">
+      @for (c of filtered(); track c.code) {
+        <mat-card class="country-card" appearance="outlined">
+          <a class="country-link" [routerLink]="['/country', c.code]">
+            <div class="country-flag-wrapper">
+              @if (c.flagUrl) {
+                <img
+                  class="country-flag"
+                  [ngSrc]="c.flagUrl"
+                  width="320"
+                  height="200"
+                  [alt]="c.flagAlt ?? c.name"
+                />
+              } @else {
+                <div class="country-flag-placeholder">No flag</div>
+              }
+
+              <button
+                mat-icon-button
+                type="button"
+                class="favorite-btn"
+                (click)="$event.preventDefault(); $event.stopPropagation(); toggleFavorite(c)"
+                [matTooltip]="favoritesSet().has(c.code) ? 'Remove from favorites' : 'Add to favorites'"
+                aria-label="Toggle favorite"
+              >
+                <mat-icon>{{
+                  favoritesSet().has(c.code) ? "star" : "star_outline"
+                }}</mat-icon>
+              </button>
+            </div>
+
+            <mat-card-content class="country-body">
+              <div class="country-title-row">
+                <h3 class="country-name">{{ c.name }}</h3>
+                <span class="country-code-pill">{{ c.code }}</span>
+              </div>
+
+              <div class="country-meta">
+                <span class="meta-pill">
+                  <mat-icon aria-hidden="true">public</mat-icon>
+                  {{ c.region || "Unknown region" }}
+                </span>
+                <span class="meta-pill">
+                  <mat-icon aria-hidden="true">location_city</mat-icon>
+                  {{ c.capital || "No capital" }}
+                </span>
+              </div>
+
+              <mat-divider />
+
+              <div class="country-facts">
+                <div class="fact">
+                  <span class="fact-label">Population</span>
+                  <span class="fact-value">{{ (c.population ?? 0) | number }}</span>
+                </div>
+                <div class="fact">
+                  <span class="fact-label">Currency</span>
+                  <span class="fact-value">{{ c.currency || "—" }}</span>
+                </div>
+              </div>
+            </mat-card-content>
+          </a>
+        </mat-card>
+      }
+    </section>
+
+    @if (!filtered().length && !error()) {
+      <section class="panel">
+        <mat-card class="status-card status-empty" appearance="outlined">
+          <mat-card-content>
+            <div class="status-title">No countries match your search</div>
+            <div class="status-text">Try a different term or disable Favorites-only.</div>
+          </mat-card-content>
+        </mat-card>
+      </section>
+    }
+  }
+</div>
+
